@@ -30,7 +30,7 @@ function Show-Header {
     }
     
     # 检查运行中的冲突进程数
-    $patterns = @("clash*", "mihomo*", "*verge*", "*yesha*", "*airtcp*", "*flybird*", "v2ray*", "xray*", "sing-box*")
+    $patterns = @("clash*", "mihomo*", "*verge*", "*yesha*", "*airtcp*", "*flybird*", "v2ray*", "xray*", "sing-box*", "nekobox*", "flclash*", "*karing*", "*shadowrocket*", "*v2rayn*")
     $running = Get-Process | Where-Object { 
         $pname = $_.ProcessName
         $patterns | Where-Object { $pname -like $_ }
@@ -92,7 +92,7 @@ function Run-Diagnostic {
     }
 
     Write-Host "`n[ 3. 后台代理软件与 Windows 服务检测 ]" -ForegroundColor White
-    $patterns = @("clash*", "mihomo*", "*verge*", "*yesha*", "*airtcp*", "*flybird*", "v2ray*", "xray*", "sing-box*", "nekobox*", "flclash*")
+    $patterns = @("clash*", "mihomo*", "*verge*", "*yesha*", "*airtcp*", "*flybird*", "v2ray*", "xray*", "sing-box*", "nekobox*", "flclash*", "*karing*", "*shadowrocket*", "*v2rayn*")
     $running = Get-Process | Where-Object { 
         $pname = $_.ProcessName
         $patterns | Where-Object { $pname -like $_ }
@@ -136,7 +136,7 @@ function Run-EmergencyFix {
 
     # 1. 终止所有代理后台进程
     Write-Host "[步骤 1/5] 强制终止所有代理后台进程与内核..." -ForegroundColor White
-    $patterns = @("clash*", "mihomo*", "*verge*", "*yesha*", "*airtcp*", "*flybird*", "v2ray*", "xray*", "sing-box*", "nekobox*", "flclash*")
+    $patterns = @("clash*", "mihomo*", "*verge*", "*yesha*", "*airtcp*", "*flybird*", "v2ray*", "xray*", "sing-box*", "nekobox*", "flclash*", "*karing*", "*shadowrocket*", "*v2rayn*")
     $running = Get-Process | Where-Object { 
         $pname = $_.ProcessName
         $patterns | Where-Object { $pname -like $_ }
@@ -226,7 +226,7 @@ while ($true) {
             Start-Sleep -Seconds 2
         }
         "5" {
-            $patterns = @("clash*", "mihomo*", "*verge*", "*yesha*", "*airtcp*", "*flybird*", "v2ray*", "xray*", "sing-box*")
+            $patterns = @("clash*", "mihomo*", "*verge*", "*yesha*", "*airtcp*", "*flybird*", "v2ray*", "xray*", "sing-box*", "nekobox*", "flclash*", "*karing*", "*shadowrocket*", "*v2rayn*")
             Get-Process | Where-Object { $pname = $_.ProcessName; $patterns | Where-Object { $pname -like $_ } } | Stop-Process -Force -ErrorAction SilentlyContinue
             Write-Host "`n✓ 代理进程已全部终止！" -ForegroundColor Green
             Start-Sleep -Seconds 2

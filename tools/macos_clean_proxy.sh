@@ -26,11 +26,14 @@ pkill -9 -f "flybird" 2>/dev/null
 pkill -9 -f "v2ray" 2>/dev/null
 pkill -9 -f "xray" 2>/dev/null
 pkill -9 -f "sing-box" 2>/dev/null
+pkill -9 -f "karing" 2>/dev/null
+pkill -9 -f "flclash" 2>/dev/null
+pkill -9 -f "shadowrocket" 2>/dev/null
+pkill -9 -f "v2rayn" 2>/dev/null
 
 # 2. 获取所有网络硬件接口并关闭系统代理
 echo "[+] 正在重置 macOS 网络服务代理配置..."
-INTERFACES=$(networksetup -listallnetworkservices 2>/dev/null | grep -v '^\*' | grep -v "An asterisk")
-for iface in $INTERFACES; do
+networksetup -listallnetworkservices 2>/dev/null | grep -v '^\*' | grep -v "An asterisk" | sed '/^$/d' | while IFS= read -r iface; do
     networksetup -setwebproxystate "$iface" off 2>/dev/null
     networksetup -setsecurewebproxystate "$iface" off 2>/dev/null
     networksetup -setsocksfirewallproxystate "$iface" off 2>/dev/null
@@ -43,6 +46,8 @@ echo "[+] 正在清理异常分流路由..."
 sudo route -n delete 128.0/1 2>/dev/null || true
 sudo route -n delete 0.0.0.0/1 2>/dev/null || true
 sudo route -n delete 1/8 2>/dev/null || true
+sudo route -n delete 198.18.0.0/15 2>/dev/null || true
+sudo route -n delete 198.18.0.0/16 2>/dev/null || true
 
 # 4. 刷新 DNS 缓存
 echo "[+] 正在刷新系统 DNS 缓存..."

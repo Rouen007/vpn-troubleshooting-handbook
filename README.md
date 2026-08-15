@@ -190,7 +190,10 @@ flowchart TD
     E --> G[❌ 系统代理指向已关闭端口，全机断网]
 ```
 
-**根本解法**：必须彻底清除 `clash-verge-service`、`verge-mihomo`、`yeshaCore` 等后台常驻守护，重置系统代理注册表与分流路由表，并刷新 DNS 缓存。
+**根本解法与预防最佳实践**：
+1. **开启 Clash Verge 服务模式 (Service Mode)**：在设置中安装并启用 Service Mode，使 Clash 拥有系统级权限，在退出 GUI 或关闭应用时能可靠地触发 TUN 网卡卸载、路由表擦除及系统 DNS 还原。
+2. **规范退出顺序**：在准备切换到夜煞云或其他客户端前，**先在 Clash 中手动关闭「TUN 模式」和「系统代理」开关**，等待 2 秒系统网络栈还原后再退出进程。
+3. **彻底清理残留后台**：必须彻底清除 `clash-verge-service`、`verge-mihomo`、`yeshaCore` 等后台常驻守护，重置系统代理注册表与分流路由表，并刷新 DNS 缓存。
 
 ---
 
@@ -242,6 +245,11 @@ curl -fsSL https://raw.githubusercontent.com/Rouen007/vpn-troubleshooting-handbo
 
 # 终端一键修复网络
 bash tools/macos_vpn_doctor.sh --fix
+
+# 免下载脚本的原生 3 行极简复位命令 (临时应急)
+networksetup -setwebproxystate "Wi-Fi" off && networksetup -setsecurewebproxystate "Wi-Fi" off
+networksetup -setdnsservers "Wi-Fi" empty
+sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 ```
 
 ---

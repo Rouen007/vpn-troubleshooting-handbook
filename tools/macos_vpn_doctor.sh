@@ -39,6 +39,7 @@ PROXY_PROCESS_PATTERNS=(
     "Surge" "surge" "sing-box" "v2ray" "xray" "v2fly" "shadowsocks" "ss-local" "ssr-local"
     "hysteria" "tuic" "trojan" "trojan-go" "naiveproxy" "juicity"
     "Tailscale" "tailscaled" "wireguard" "openvpn" "ProtonVPN"
+    "Karing" "karing" "FlClash" "flclash" "shadowrocket" "v2rayn" "v2rayN"
 )
 
 # 清屏辅助
@@ -415,6 +416,8 @@ run_emergency_fix() {
     sudo route -n delete 128.0/1 2>/dev/null || true
     sudo route -n delete 0.0.0.0/1 2>/dev/null || true
     sudo route -n delete 1/8 2>/dev/null || true
+    sudo route -n delete 198.18.0.0/15 2>/dev/null || true
+    sudo route -n delete 198.18.0.0/16 2>/dev/null || true
     echo -e "  ${GREEN}✓ 异常分流路由已清理${NC}"
 
     echo ""
