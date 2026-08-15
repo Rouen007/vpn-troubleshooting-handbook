@@ -1,9 +1,9 @@
 # 跨平台多品牌 VPN / 代理客户端冲突终极剖析与排障全景指南
 ### 🌐 Multi-Brand VPN & Proxy Conflict Resolution Handbook (Windows / macOS / Android / iOS / Linux)
 
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Android%20%7C%20iOS%20%7C%20Linux-blue)](https://github.com/Rouen007/vpn-troubleshooting-handbook)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Android%20%7C%20iOS%20%7C%20Linux-blue)](https://github.com/Rouen007)
 [![Topic](https://img.shields.io/badge/Topic-VPN%20Conflict%20%7C%20TUN%20Routing%20%7C%20Port%20Collision-orange)](https://github.com/Rouen007/vpn-troubleshooting-handbook)
-[![Tool](https://img.shields.io/badge/Tool-VPN%20Doctor%20(macOS%20App)-brightgreen)](https://github.com/Rouen007/vpn-troubleshooting-handbook/tree/main/tools)
+[![Tool](https://img.shields.io/badge/Tool-VPN%20Doctor%20(macOS%20%2B%20Windows)-brightgreen)](https://github.com/Rouen007/vpn-troubleshooting-handbook/tree/main/tools)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
@@ -16,17 +16,16 @@
 2. **开启客户端 B 后，客户端 A 瞬间被踢下线或静默断流**；
 3. **关闭了 Clash/夜煞云 等软件后，再打开 AirTCP/Flybird 无法使用，整机断网**；
 4. **客户端启动失败，控制台狂报 `bind: address already in use` (7890/7897/10808 等端口硬碰撞)**；
-5. **内核以 root 守护进程驻留，关闭 GUI 窗口后依然死锁系统路由表与 DNS**；
+5. **内核以 root / SYSTEM 守护服务驻留，关闭 GUI 窗口后依然死锁系统路由表与 DNS**；
 6. **网速剧烈波动、持续转菊花、CPU 占用飙升至 100%（后台拉锯战 Flapping）**。
 
-本项目深度剖析多品牌 VPN 冲突的 **底层技术根源与实机典型案列**，并开源提供 **macOS VPN Doctor 桌面一键体检急救工具** 与 **跨平台排障脚本**。
+本项目深度剖析多品牌 VPN 冲突在 **Windows 与 macOS 底层的异曲同工之处**，并开源提供 **跨平台 VPN Doctor 桌面一键体检急救工具**。
 
 ---
 
-## 🚀 macOS 桌面一键排障神器：VPN Doctor
+## 🚀 跨平台一键排障神器：VPN Doctor (Windows & macOS)
 
-针对 macOS 上多款 VPN 打架、关掉软件后断网的痛点，本项目开发了 **VPN Doctor**，支持原生双击 App 与终端彩色交互看板：
-
+### 🍏 macOS 端（支持双击原生 App & 终端彩色看板）
 ```text
 ======================================================================
      🛠️  VPN Doctor - macOS 多 VPN / 机场软件冲突体检修复工具         
@@ -46,41 +45,55 @@
   7) 🔄 Wi-Fi 网卡软重启   (解决底层网络栈/DHCP卡死，自动开关Wi-Fi)
   0) 退出工具
 ```
+* **一键安装到桌面**：
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/Rouen007/vpn-troubleshooting-handbook/main/tools/install_macos_desktop.sh | bash
+  ```
 
-### ⚡ 1 秒安装到 macOS 桌面（双击即用）
-打开 macOS 终端运行以下命令，即可在桌面生成 **`VPN冲突修复工具.app`** 与 **`.command`**：
-```bash
-curl -fsSL https://raw.githubusercontent.com/Rouen007/vpn-troubleshooting-handbook/main/tools/install_macos_desktop.sh | bash
-```
+---
 
-### 💻 终端快速调用命令
-```bash
-# 执行深度诊断体检
-bash tools/macos_vpn_doctor.sh --check
-
-# 一键换梯清场与网络急救 (秒解断网)
-bash tools/macos_vpn_doctor.sh --fix
-```
+### 🪟 Windows 端（PowerShell 全能急救脚本 & 双击批处理）
+* **运行方式**：直接右键以管理员身份运行 **[`tools/windows_vpn_doctor.bat`](tools/windows_vpn_doctor.bat)** 或在 PowerShell 中执行：
+  ```powershell
+  # 终端一键急救清场
+  powershell -ExecutionPolicy Bypass -File .\tools\windows_clean_proxy.ps1
+  ```
 
 ---
 
 ## 📖 目录
-- [一、多品牌 VPN 冲突的底层技术根源](#一多品牌-vpn-冲突的底层技术根源)
+- [一、Windows 与 macOS 代理底层机制深度对比 (Architecture Mapping)](#一windows-与-macos-代理底层机制深度对比-architecture-mapping)
+- [二、多品牌 VPN 冲突的底层技术根源](#二多品牌-vpn-冲突的底层技术根源)
   - [1. 虚拟网卡驱动与系统接口互斥 (TUN / TAP / Wintun / VpnService)](#1-虚拟网卡驱动与系统接口互斥-tun--tap--wintun--vpnservice)
   - [2. 路由表抢占与 Metric 跳数竞争 (0.0.0.0/0 默认网关互斥)](#2-路由表抢占与-metric-跳数竞争-00000-默认网关互斥)
   - [3. 本地回环端口硬碰撞 (bind: address already in use)](#3-本地回环端口硬碰撞-bind-address-already-in-use)
   - [4. 系统全局代理设置 (System Proxy) 覆盖与残留](#4-系统全局代理设置-system-proxy-覆盖与残留)
   - [5. DNS 污染、Fake-IP 地址池与劫持冲突](#5-dns-污染fake-ip-地址池与劫持冲突)
-  - [6. 后台 Privileged 守护进程重连拉锯战 (Flapping Loop)](#6-后台-privileged-守护进程重连拉锯战-flapping-loop)
-- [二、典型实机冲突案例深度剖析 (Case Studies)](#二典型实机冲突案例深度剖析-case-studies)
+  - [6. 后台守护进程重连拉锯战 (Flapping Loop)](#6-后台守护进程重连拉锯战-flapping-loop)
+- [三、典型实机冲突案例深度剖析 (Case Studies)](#三典型实机冲突案例深度剖析-case-studies)
   - [案例：Clash Verge Rev ⇄ AirTCP / 夜煞云 切换断网](#案例clash-verge-rev--airtcp--夜煞云-切换断网)
-- [三、多品牌 VPN 共存与冲突解决的四大架构方案](#三多品牌-vpn-共存与冲突解决的四大架构方案)
-- [四、跨平台一键排障与清理命令速查 (Cheat Sheet)](#四跨平台一键排障与清理命令速查-cheat-sheet)
-- [五、排坑军规与最佳实践 (Golden Rules)](#五排坑军规与最佳实践-golden-rules)
+- [四、多品牌 VPN 共存与冲突解决的四大架构方案](#四多品牌-vpn-共存与冲突解决的四大架构方案)
+- [五、跨平台一键排障与清理命令速查 (Cheat Sheet)](#五跨平台一键排障与清理命令速查-cheat-sheet)
+- [六、排坑军规与最佳实践 (Golden Rules)](#六排坑军规与最佳实践-golden-rules)
 
 ---
 
-## 一、多品牌 VPN 冲突的底层技术根源
+## 一、Windows 与 macOS 代理底层机制深度对比 (Architecture Mapping)
+
+Windows 与 macOS 在实现 VPN 与代理劫持时，**核心逻辑高度一致，但在操作系统 API 与底层架构上存在一一对应关系**：
+
+| 技术维度 | Windows 操作系统底层 | macOS 操作系统底层 | 典型冲突现象 (两端通病) |
+| :--- | :--- | :--- | :--- |
+| **系统代理配置** | `HKCU\...\Internet Settings`<br>`ProxyEnable` & `ProxyServer`<br>`WinINet / WinHTTP` | `SystemConfiguration.framework`<br>`scutil --proxy`<br>`networksetup -setwebproxy` | 软件退出后系统代理指向死端口（`127.0.0.1:7897`），浏览器提示代理无法连接。 |
+| **虚拟 TUN 网卡** | `Wintun.dll` / `TAP-Windows Adapter`<br>NDIS Miniport 虚拟网卡驱动 | `/dev/utun*` 设备<br>`NetworkExtension` Framework | 多个软件同时建立 TUN 接口，网卡驱动报错或 ARP 错乱。 |
+| **分流路由表劫持** | `0.0.0.0 mask 128.0.0.0`<br>`128.0.0.0 mask 128.0.0.0`<br>`route add / Set-NetRoute` | `0.0.0.0/1 -> utunX`<br>`128.0.0.0/1 -> utunX`<br>`route add -interface utunX` | 软件异常退出后，分流路由残留指向已销毁的虚拟网卡，**所有流量进入黑洞彻底断网**。 |
+| **DNS 解析与缓存** | `Dnscache` 服务<br>`Clear-DnsClientCache`<br>`ipconfig /flushdns` | `mDNSResponder` 守护进程<br>`dscacheutil -flushcache`<br>`killall -HUP mDNSResponder` | 残留 Fake-IP (`198.18.x.x`) 映射或死锁 `127.0.0.1` 本地 DNS，全网域名解析失败。 |
+| **提权后台守护进程** | **Windows 服务 (Services.msc)**<br>`ClashVergeService` / `NT AUTHORITY\SYSTEM` | **macOS 守护服务 (launchd)**<br>`/Library/PrivilegedHelperTools`<br>`clash-verge-service` (root) | **关闭 GUI 窗口不等于杀死内核**！以 SYSTEM/root 运行的内核继续霸占 TUN 和端口。 |
+| **端口监听排查** | `netstat -ano \| findstr :7890`<br>`taskkill /F /PID <pid>` | `lsof -nP -iTCP:7890 -sTCP:LISTEN`<br>`sudo kill -9 <pid>` | 端口被僵尸进程霸占，报 `bind: address already in use` 启动失败。 |
+
+---
+
+## 二、多品牌 VPN 冲突的底层技术根源
 
 ```mermaid
 graph TD
@@ -89,7 +102,7 @@ graph TD
     A --> D[3. 本地回环端口碰撞 EADDRINUSE]
     A --> E[4. 系统全局代理注册表/scutil覆盖与残留]
     A --> F[5. DNS 劫持与 Fake-IP 198.18.0.0/16 冲突]
-    A --> G[6. 后台 root 守护进程残存拉锯战]
+    A --> G[6. 后台 root/SYSTEM 守护进程残存拉锯战]
 ```
 
 ### 1. 虚拟网卡驱动与系统接口互斥 (TUN / TAP / Wintun / VpnService)
@@ -107,12 +120,12 @@ graph TD
 
 当开启 **TUN 模式 (全局虚拟网卡接管)** 时，客户端会向系统路由表注入默认路由或分流掩码：
 ```text
-0.0.0.0/1 -> 172.19.0.1 (utun4)
-128.0.0.0/1 -> 172.19.0.1 (utun4)
+0.0.0.0/1 -> 172.19.0.1 (utun4 或 Wintun)
+128.0.0.0/1 -> 172.19.0.1 (utun4 或 Wintun)
 ```
 * **冲突表现**：
-  1. 客户端 A 写入了指向 `utun3` 的路由；
-  2. 客户端 B 启动后，强行建立 `utun4` 并覆盖分流路由；
+  1. 客户端 A 写入了指向网卡 A 的路由；
+  2. 客户端 B 启动后，强行建立网卡 B 并覆盖分流路由；
   3. 当客户端 B 退出时，删除了自己的网卡，但**不会恢复客户端 A 的旧路由**；
   4. 最终导致系统残留指向死网卡的路由条目，**所有物理外网流量彻底黑洞化 (Blackhole)**。
 
@@ -142,46 +155,46 @@ graph TD
 
 ### 5. DNS 污染、Fake-IP 地址池与劫持冲突
 
-* **Fake-IP 冲突**：Clash / Sing-box 默认分配 `198.18.0.0/15` 作为虚拟 Fake-IP。若旧内核退出后系统未刷新 `mDNSResponder`，系统仍拿着旧 Fake-IP 解析，导致连接超时。
+* **Fake-IP 冲突**：Clash / Sing-box 默认分配 `198.18.0.0/15` 作为虚拟 Fake-IP。若旧内核退出后系统未刷新 DNS 缓存，系统仍拿着旧 Fake-IP 解析，导致连接超时。
 * **死锁 DNS**：网卡 DNS 被硬编码指定为 `127.0.0.1`，代理关闭后无本地 DNS 服务响应，全网域名解析失败。
 
 ---
 
-## 二、典型实机冲突案例深度剖析 (Case Studies)
+## 三、典型实机冲突案例深度剖析 (Case Studies)
 
 ### 案例：Clash Verge Rev ⇄ AirTCP / 夜煞云 切换断网
 
-在 macOS 真实排障环境中，抓取到了以下典型的多软件死锁现场：
+在真实排障环境中，抓取到了以下典型的多软件死锁现场：
 
 ```text
-[ 运行中的多软件后台 root 级内核 ]:
-- PID 59602 : /Applications/夜煞云.app/Contents/MacOS/夜煞云
-- PID 59605 : root /Applications/夜煞云.app/Contents/MacOS/yeshaCore
-- PID 64557 : /Applications/AirTCP.app/Contents/MacOS/AirTCP (监听 :9191, :50999)
-- PID 69694 : /Applications/Clash Verge.app/Contents/MacOS/clash-verge
-- PID 69872 : root /Library/PrivilegedHelperTools/.../clash-verge-service
-- PID 69875 : root /Applications/Clash Verge.app/Contents/MacOS/verge-mihomo
+[ 运行中的多软件后台 root / SYSTEM 级内核 ]:
+- PID 59602 : 夜煞云 GUI
+- PID 59605 : root / SYSTEM 权限的 yeshaCore
+- PID 64557 : AirTCP (监听 :9191, :50999)
+- PID 69694 : Clash Verge GUI
+- PID 69872 : root / SYSTEM 守护服务 clash-verge-service
+- PID 69875 : root / SYSTEM 核心 verge-mihomo
 
 [ 系统异常 ]:
-- Wi-Fi 代理锁定在 127.0.0.1:7897 (端口已死)
-- 路由表残留 128.0/1 -> 172.19.0.1 (指向死 utun 网卡)
+- 代理锁定在 127.0.0.1:7897 (端口已死)
+- 路由表残留 128.0/1 -> 172.19.0.1 (指向死虚拟网卡)
 ```
 
 ```mermaid
 flowchart TD
-    A[用户在桌面关闭 Clash Verge 窗口] --> B[⚠️ macOS PrivilegedHelperService 守护进程依然存活]
-    B --> C[root 权限的 verge-mihomo 核心未被杀死]
+    A[用户在桌面关闭 Clash Verge 窗口] --> B[⚠️ 后台提权守护服务依然存活]
+    B --> C[root/SYSTEM 权限的内核核心未被杀死]
     C --> D[TUN 虚拟网卡 & 128.0/1 分流路由未释放]
     D --> E[打开 AirTCP / 夜煞云]
     E --> F[❌ AirTCP 的 TUN 路由与 Clash 冲突，流量进入黑洞]
     E --> G[❌ 系统代理指向已关闭端口，全机断网]
 ```
 
-**根本解法**：必须通过 `sudo pkill -9` 彻底清除 `clash-verge-service`、`verge-mihomo`、`yeshaCore` 等 root 级后台常驻守护，重置系统代理与 `128.0/1` 分流路由表，并刷新 `mDNSResponder`。
+**根本解法**：必须彻底清除 `clash-verge-service`、`verge-mihomo`、`yeshaCore` 等后台常驻守护，重置系统代理注册表与分流路由表，并刷新 DNS 缓存。
 
 ---
 
-## 三、多品牌 VPN 共存与冲突解决的四大架构方案
+## 四、多品牌 VPN 共存与冲突解决的四大架构方案
 
 ```mermaid
 flowchart TD
@@ -219,7 +232,7 @@ flowchart TD
 
 ---
 
-## 四、跨平台一键排障与清理命令速查 (Cheat Sheet)
+## 五、跨平台一键排障与清理命令速查 (Cheat Sheet)
 
 ### 1. macOS 平台：全自动排障与急救
 
@@ -236,15 +249,8 @@ bash tools/macos_vpn_doctor.sh --fix
 ### 2. Windows 平台：释放端口与重置注册表
 
 ```powershell
-# 1. 强制结束冲突的代理进程
-taskkill /F /IM "clash.exe" 2>$null
-taskkill /F /IM "mihomo.exe" 2>$null
-taskkill /F /IM "v2ray.exe" 2>$null
-taskkill /F /IM "xray.exe" 2>$null
-
-# 2. 一键重置 Windows 系统代理注册表
-Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings' -Name ProxyEnable -Value 0
-Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings' -Name ProxyServer -Value ""
+# 运行 PowerShell 全能急救
+powershell -ExecutionPolicy Bypass -File .\tools\windows_clean_proxy.ps1
 ```
 
 ---
@@ -261,7 +267,7 @@ adb shell settings delete global http_proxy
 
 ---
 
-## 五、排坑军规与最佳实践 (Golden Rules)
+## 六、排坑军规与最佳实践 (Golden Rules)
 
 1. **一机一核**：一台设备上任何时刻**只允许一个接管全局 TUN 网卡的程序处于激活状态**。
 2. **退出前先断开**：在切换或关闭 VPN 软件时，先在软件内点击 **“停止/断开连接”** 再关闭窗口，避免系统代理注册表残留。
